@@ -1,0 +1,156 @@
+package com.example.vipin.taxi;
+
+import android.Manifest;
+import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.location.Address;
+import android.location.Criteria;
+import android.location.Geocoder;
+import android.location.Location;
+import android.location.LocationManager;
+import android.media.Image;
+import android.provider.Settings;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentActivity;
+import android.os.Bundle;
+import android.support.v4.app.FragmentManager;
+import android.support.v7.app.AlertDialog;
+import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.ImageButton;
+import android.widget.Toast;
+
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.location.LocationListener;
+import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.maps.CameraUpdateFactory;
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MarkerOptions;
+
+import java.util.List;
+import java.util.Locale;
+
+public class Bookride extends Fragment {
+
+
+    private GoogleMap mMap;
+    private SupportMapFragment fragment;
+    LocationManager lm;
+    EditText e2;
+    LatLng ll;
+    Button b1, b2;
+    // ImageButton ib;
+
+
+    @Override
+    public View onCreateView(LayoutInflater li, ViewGroup vg, Bundle b) {
+
+        View vv = li.inflate(R.layout.activity_bookride, vg, false);
+        e2 = (EditText) vv.findViewById(R.id.editText2);
+        // ib = (ImageButton) vv.findViewById(R.id.imageButton);
+        //ib.setOnClickListener(new View.OnClickListener() {
+        //  @Override
+        // public void onClick(View v) {
+               /* Intent i=new Intent(getActivity(),Home.class);
+                startActivity(i); */
+
+        //   Toast.makeText(getActivity(), "Hello", Toast.LENGTH_LONG).show();
+
+        //}
+        //});
+        b1 = (Button) vv.findViewById(R.id.button3);
+        b1.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(getActivity(), Popup1.class));
+            }
+        });
+
+
+        return vv;
+    }
+
+
+    @Override
+    public void onActivityCreated(Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+
+
+        FragmentManager fm = getChildFragmentManager();
+        fragment = (SupportMapFragment) fm.findFragmentById(R.id.map);
+        if (fragment == null) {
+            fragment = SupportMapFragment.newInstance();
+            fm.beginTransaction().replace(R.id.map, fragment).commit();
+
+
+        }
+    }
+
+
+    @Override
+    public void onResume() {
+        super.onResume();
+
+
+        lm = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
+        try {
+
+            if (ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+
+                return;
+            }
+            Location l = lm.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
+            double lat = l.getLatitude();
+            double lng = l.getLongitude();
+            LatLng ll = new LatLng(lat, lng);
+
+
+            Geocoder gc = new Geocoder(getActivity(), Locale.getDefault());
+
+            List<Address> addresses = gc.getFromLocation(lat, lng, 1);
+            String result = null;
+            result = addresses.get(0).getAddressLine(0) + ", " + addresses.get(0).getAddressLine(1) + ", " + addresses.get(0).getAddressLine(2) + ", " + addresses.get(0).getAddressLine(3);
+                    //+ ", " + "lat=" + addresses.get(0).getLatitude() + ", " + "lng=" + addresses.get(0).getLongitude();
+            e2.setText(result);
+
+
+            if (mMap == null) {
+
+
+                mMap = fragment.getMap();
+                mMap.addMarker(new MarkerOptions().position(ll).title("Book now"));
+                mMap.moveCamera(CameraUpdateFactory.newLatLng(ll));
+                mMap.animateCamera(CameraUpdateFactory.zoomTo(40));
+                mMap.setMapType(GoogleMap.MAP_TYPE_SATELLITE);
+
+
+            }
+        }
+        catch (Exception e){
+
+
+        }
+    }
+
+
+}
+
+
+ 
+
+
+
+
+
+
